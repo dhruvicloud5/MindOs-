@@ -1,4 +1,20 @@
 services:
+  sonarqube:
+    image: sonarqube:community
+    container_name: dhruvi-sonarqube
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9000:9000"
+    ulimits:
+      nofile:
+        soft: 131072
+        hard: 131072
+      nproc: 8192
+    volumes:
+      - sonarqube-data:/opt/sonarqube/data
+      - sonarqube-extensions:/opt/sonarqube/extensions
+      - sonarqube-logs:/opt/sonarqube/logs
+
   jenkins:
     build:
       context: ./jenkins
@@ -11,3 +27,6 @@ services:
 
 volumes:
   jenkins-data:
+  sonarqube-data:
+  sonarqube-extensions:
+  sonarqube-logs:

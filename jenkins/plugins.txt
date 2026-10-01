@@ -2,3 +2,4 @@ workflow-aggregator
 git
 github-branch-source
 pipeline-stage-view
+sonar

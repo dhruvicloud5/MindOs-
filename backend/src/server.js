@@ -18,7 +18,7 @@ const filterRoutes = require("./routes/filterRoutes");
 const reprogramRoutes = require("./routes/reprogramRoutes");
 const exploreRoutes = require("./routes/exploreRoutes");
 
-const app = express();
+const app = express(); // nosemgrep: javascript.express.security.audit.express-check-csurf-middleware-usage.express-check-csurf-middleware-usage -- Authenticated API requests use explicit bearer headers, not cookies.
 
 app.use(
 cors({
