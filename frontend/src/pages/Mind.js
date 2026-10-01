@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Brain, Plus, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { Brain, Plus } from "lucide-react";
 
 function Mind() {
   const [entries, setEntries] = useState([]);

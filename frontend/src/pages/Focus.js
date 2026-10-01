@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Check, Clock3, Plus, Target, Trash2 } from "lucide-react";
 
 const API_URL = process.env.REACT_APP_API_URL || "";
@@ -11,7 +11,7 @@ function Focus() {
   const [remaining, setRemaining] = useState(0);
   const [error, setError] = useState("");
 
-  const request = async (path, options = {}) => {
+  const request = useCallback(async (path, options = {}) => {
     const response = await fetch(`${API_URL}/api/focus${path}`, {
       ...options,
       headers: { ...(options.body ? { "Content-Type": "application/json" } : {}), Authorization: `Bearer ${localStorage.getItem("token")}` }
@@ -19,16 +19,20 @@ function Focus() {
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || "Request failed");
     return data;
-  };
+  }, []);
 
-  const load = async () => { try { setSessions(await request("/")); } catch (loadError) { setError(loadError.message); } };
-  useEffect(() => { load(); }, []);
+  const load = useCallback(async () => { try { setSessions(await request("/")); } catch (loadError) { setError(loadError.message); } }, [request]);
+  const complete = useCallback(async (id) => {
+    try { await request(`/${id}/complete`, { method: "PATCH" }); setActive(null); setRemaining(0); await load(); } catch (completeError) { setError(completeError.message); }
+  }, [load, request]);
+
+  useEffect(() => { load(); }, [load]);
   useEffect(() => {
     if (!active) return undefined;
     const timer = window.setInterval(() => setRemaining((value) => Math.max(value - 1, 0)), 1000);
     return () => window.clearInterval(timer);
   }, [active]);
-  useEffect(() => { if (active && remaining === 0) complete(active.id); }, [active, remaining]);
+  useEffect(() => { if (active && remaining === 0) complete(active.id); }, [active, remaining, complete]);
 
   const start = async (event) => {
     event.preventDefault();
@@ -39,9 +43,6 @@ function Focus() {
       setTitle("");
       setError("");
     } catch (startError) { setError(startError.message); }
-  };
-  const complete = async (id) => {
-    try { await request(`/${id}/complete`, { method: "PATCH" }); setActive(null); setRemaining(0); await load(); } catch (completeError) { setError(completeError.message); }
   };
   const remove = async (id) => {
     if (!window.confirm("Delete this focus session?")) return;

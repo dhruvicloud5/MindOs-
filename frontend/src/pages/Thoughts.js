@@ -3,10 +3,7 @@ import {
   Lightbulb,
   Plus,
   Trash2,
-  Edit2,
-  Heart,
   Search,
-  Filter,
   X
 } from "lucide-react";
 
@@ -23,9 +20,6 @@ function Thoughts() {
     mood: "",
     category: ""
   });
-  
-  // Editing state
-  const [editingId, setEditingId] = useState(null);
   
   // Search and filter
   const [searchTerm, setSearchTerm] = useState("");

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   AlertCircle,
   BookOpen,
@@ -32,7 +32,7 @@ function Explore() {
   const [showForm, setShowForm] = useState(false);
   const [error, setError] = useState("");
 
-  const request = async (path, options = {}) => {
+  const request = useCallback(async (path, options = {}) => {
     const token = localStorage.getItem("token");
     const response = await fetch(`${API_URL}/api/explore${path}`, {
       ...options,
@@ -41,9 +41,9 @@ function Explore() {
     const data = await response.json();
     if (!response.ok || !data.success) throw new Error(data.message || "Request failed");
     return data;
-  };
+  }, []);
 
-  const loadExplorations = async () => {
+  const loadExplorations = useCallback(async () => {
     try {
       setLoading(true);
       const data = await request("/");
@@ -53,9 +53,9 @@ function Explore() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [request]);
 
-  useEffect(() => { loadExplorations(); }, []);
+  useEffect(() => { loadExplorations(); }, [loadExplorations]);
 
   const createExploration = async (event) => {
     event.preventDefault();

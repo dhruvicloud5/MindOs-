@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Check, Plus, RefreshCw, Trash2, X } from "lucide-react";
 
 const API_URL = process.env.REACT_APP_API_URL || "";
@@ -10,7 +10,7 @@ function Reprogram() {
   const [error, setError] = useState("");
   const [form, setForm] = useState({ title: "", description: "", affirmation: "" });
 
-  const request = async (path, options = {}) => {
+  const request = useCallback(async (path, options = {}) => {
     const response = await fetch(`${API_URL}/api/reprograms${path}`, {
       ...options,
       headers: { ...(options.body ? { "Content-Type": "application/json" } : {}), Authorization: `Bearer ${localStorage.getItem("token")}` }
@@ -18,9 +18,9 @@ function Reprogram() {
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || "Request failed");
     return data;
-  };
+  }, []);
 
-  const loadHabits = async () => {
+  const loadHabits = useCallback(async () => {
     try {
       setLoading(true);
       setHabits(await request("/"));
@@ -29,9 +29,9 @@ function Reprogram() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [request]);
 
-  useEffect(() => { loadHabits(); }, []);
+  useEffect(() => { loadHabits(); }, [loadHabits]);
 
   const createHabit = async (event) => {
     event.preventDefault();

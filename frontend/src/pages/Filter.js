@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Check, Filter as FilterIcon, Plus, Trash2 } from "lucide-react";
 
 const API_URL = process.env.REACT_APP_API_URL || "";
@@ -8,14 +8,14 @@ function Filter() {
   const [form, setForm] = useState({ thought: "", category: "important", reality: "", action: "" });
   const [error, setError] = useState("");
 
-  const request = async (path, options = {}) => {
+  const request = useCallback(async (path, options = {}) => {
     const response = await fetch(`${API_URL}/api/filters${path}`, { ...options, headers: { ...(options.body ? { "Content-Type": "application/json" } : {}), Authorization: `Bearer ${localStorage.getItem("token")}` } });
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || "Request failed");
     return data;
-  };
-  const load = async () => { try { setItems(await request("/")); } catch (loadError) { setError(loadError.message); } };
-  useEffect(() => { load(); }, []);
+  }, []);
+  const load = useCallback(async () => { try { setItems(await request("/")); } catch (loadError) { setError(loadError.message); } }, [request]);
+  useEffect(() => { load(); }, [load]);
   const create = async (event) => { event.preventDefault(); try { await request("/", { method: "POST", body: JSON.stringify(form) }); setForm({ thought: "", category: "important", reality: "", action: "" }); await load(); } catch (createError) { setError(createError.message); } };
   const toggle = async (id) => { try { await request(`/${id}/toggle`, { method: "PATCH" }); await load(); } catch (toggleError) { setError(toggleError.message); } };
   const remove = async (id) => {
