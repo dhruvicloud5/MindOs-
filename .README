@@ -1,0 +1,1067 @@
+MindOS
+A personal workspace for capturing thoughts, protecting focus, organizing ideas, and building intentional routines.
+
+MindOS is a full-stack web application built with React, Node.js/Express, and MySQL. The application provides a personal workspace where authenticated users can manage their thoughts, mind check-ins, focus sessions, filters, and reprogramming routines.
+
+The project is containerized with Docker and is being prepared for infrastructure deployment using Terraform.
+
+Table of Contents
+Project Overview
+
+Features
+
+Technology Stack
+
+Project Structure
+
+Application Architecture
+
+Authentication
+
+Database
+
+API Structure
+
+Local Development
+
+Docker
+
+Environment Variables
+
+Frontend
+
+Backend
+
+Database Tables
+
+Testing Backend Syntax
+
+Troubleshooting
+
+DevOps
+
+Terraform Deployment
+
+Security Practices
+
+Future Improvements
+
+Author
+
+Project Overview
+MindOS is designed as a private digital workspace.
+
+The application currently contains the following areas:
+
+Section	Purpose
+Dashboard	Application overview
+Mind	Capture and record mental state
+Thoughts	Store personal thoughts
+Focus	Track focus sessions
+Filter	Separate thoughts into useful categories
+Reprogram	Create and complete intentional routines
+Explore	Explore questions and ideas
+Settings	Manage user profile and preferences
+
+The application uses authentication so each user's data can be associated with their account.
+
+Features
+Authentication
+MindOS supports:
+
+User registration
+
+User login
+
+Password hashing
+
+JWT authentication
+
+Protected API routes
+
+User-specific data
+
+Passwords are never stored as plain text.
+
+Passwords are hashed using bcryptjs.
+
+Authentication tokens are generated using jsonwebtoken.
+
+Mind
+The Mind section allows users to record:
+
+Energy
+
+Clarity
+
+Stress
+
+Mood
+
+Notes
+
+Each entry belongs to the authenticated user.
+
+Thoughts
+Users can create and manage personal thoughts.
+
+A thought can contain:
+
+Content
+
+Mood
+
+Creation time
+
+Updated time
+
+Users only access their own thoughts.
+
+Focus
+Focus sessions can be created and tracked.
+
+The backend stores information associated with the user's focus sessions.
+
+Filter
+The Filter section helps organize thoughts into categories such as:
+
+Thought
+
+Category
+
+Reality
+
+Action
+
+Reprogram
+Users can create intentional routines or affirmations.
+
+A reprogram entry contains:
+
+Title
+
+Description
+
+Affirmation
+
+Completion status
+
+Completion timestamp
+
+Users can mark a reprogram entry as completed or incomplete.
+
+Explore
+The Explore section is intended to provide a space for exploring:
+
+Questions
+
+Problems
+
+Ideas
+
+Useful information
+
+AI functionality can be integrated here in a future version.
+
+Technology Stack
+Frontend
+React 18
+
+React Router
+
+Lucide React
+
+CSS
+
+Google Fonts
+
+Backend
+Node.js
+
+Express.js
+
+MySQL2
+
+JWT
+
+bcryptjs
+
+CORS
+
+dotenv
+
+Database
+MySQL 8
+
+Containers
+Docker
+
+Docker Compose
+
+Infrastructure
+Planned deployment:
+
+AWS
+
+Terraform
+
+Amazon ECR
+
+Amazon ECS Fargate
+
+Application Load Balancer
+
+Amazon RDS MySQL
+
+AWS Secrets Manager
+
+Amazon CloudWatch
+
+Amazon VPC
+
+Project Structure
+Dhruvi-server-app/
+│
+├── backend/
+│   ├── src/
+│   │   ├── config/
+│   │   │   └── database.js
+│   │   │
+│   │   ├── controllers/
+│   │   │   ├── authController.js
+│   │   │   ├── filterController.js
+│   │   │   ├── focusController.js
+│   │   │   ├── mindController.js
+│   │   │   ├── profileController.js
+│   │   │   ├── reprogramController.js
+│   │   │   └── thoughtsController.js
+│   │   │
+│   │   ├── middleware/
+│   │   │   └── authMiddleware.js
+│   │   │
+│   │   ├── routes/
+│   │   │   ├── authRoutes.js
+│   │   │   ├── filterRoutes.js
+│   │   │   ├── focusRoutes.js
+│   │   │   ├── mindRoutes.js
+│   │   │   ├── profileRoutes.js
+│   │   │   ├── reprogramRoutes.js
+│   │   │   └── thoughtsRoutes.js
+│   │   │
+│   │   └── server.js
+│   │
+│   ├── Dockerfile
+│   ├── package.json
+│   └── .env
+│
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   │   └── Layout.js
+│   │   │
+│   │   ├── pages/
+│   │   │   ├── Dashboard.js
+│   │   │   ├── Login.js
+│   │   │   ├── Signup.js
+│   │   │   ├── Mind.js
+│   │   │   ├── Thoughts.js
+│   │   │   ├── Focus.js
+│   │   │   ├── Filter.js
+│   │   │   ├── Reprogram.js
+│   │   │   ├── Explore.js
+│   │   │   └── Settings.js
+│   │   │
+│   │   ├── App.js
+│   │   └── index.css
+│   │
+│   └── package.json
+│
+├── terraform/
+│   └── Infrastructure as Code
+│
+├── docker-compose.yml
+├── .gitignore
+└── README.md
+
+Application Architecture
+The current application follows a three-tier architecture.
+
+                   User
+                    |
+                    v
+             React Frontend
+                    |
+                    | HTTP API
+                    v
+             Node.js Backend
+                    |
+                    | MySQL connection
+                    v
+                MySQL DB
+
+For production, the intended architecture is:
+
+                    Internet
+                       |
+                       v
+             Application Load Balancer
+                       |
+             +---------+---------+
+             |                   |
+             v                   v
+        Frontend ECS        Backend ECS
+          Fargate             Fargate
+                                 |
+                    +------------+------------+
+                    |                         |
+                    v                         v
+              Secrets Manager            RDS MySQL
+
+Authentication
+Authentication uses JWT.
+
+The authentication flow is:
+
+User
+ |
+ | email + password
+ v
+POST /api/auth/login
+ |
+ v
+Backend
+ |
+ | verify password
+ v
+JWT token
+ |
+ v
+Frontend
+ |
+ | Authorization: Bearer <token>
+ v
+Protected API
+
+Signup flow:
+
+User
+ |
+ | name + email + password
+ v
+POST /api/auth/signup
+ |
+ v
+Password hashed with bcrypt
+ |
+ v
+User stored in MySQL
+ |
+ v
+JWT generated
+
+Database
+The application uses MySQL.
+
+The backend connects through:
+
+backend/src/config/database.js
+
+The application creates the required database tables during initialization.
+
+The main tables are:
+
+users
+thoughts
+mind_entries
+focus_sessions
+filters
+reprograms
+
+Database Tables
+users
+Stores user authentication information.
+
+id
+name
+email
+password
+created_at
+
+thoughts
+Stores user thoughts.
+
+id
+user_id
+content
+mood
+created_at
+updated_at
+
+mind_entries
+Stores Mind check-ins.
+
+id
+user_id
+energy
+clarity
+stress
+mood
+note
+created_at
+
+focus_sessions
+Stores focus session information.
+
+id
+user_id
+title
+duration
+started_at
+completed
+completed_at
+
+filters
+Stores filtered thoughts.
+
+id
+user_id
+thought
+category
+reality
+action
+created_at
+
+reprograms
+Stores intentional routines and affirmations.
+
+id
+user_id
+title
+description
+affirmation
+completed
+completed_at
+created_at
+
+API Structure
+The backend API is available under:
+
+/api
+
+Authentication:
+
+POST /api/auth/signup
+POST /api/auth/login
+
+Profile:
+
+GET /api/profile
+
+Mind:
+
+GET  /api/mind
+POST /api/mind
+
+Thoughts:
+
+GET    /api/thoughts
+POST   /api/thoughts
+DELETE /api/thoughts/:id
+
+Focus:
+
+GET  /api/focus
+POST /api/focus
+PATCH /api/focus/:id/complete
+
+Filter:
+
+GET    /api/filter
+POST   /api/filter
+PATCH  /api/filter/:id/toggle
+DELETE /api/filter/:id
+
+Reprogram:
+
+GET    /api/reprogram
+POST   /api/reprogram
+PATCH  /api/reprogram/:id/complete
+DELETE /api/reprogram/:id
+
+All user-data endpoints require authentication.
+
+Local Development
+Prerequisites
+Install:
+
+Node.js
+
+npm
+
+Docker
+
+Docker Compose
+
+MySQL client (optional)
+
+Verify:
+
+node --version
+npm --version
+docker --version
+docker compose version
+
+Environment Variables
+The backend requires environment variables for:
+
+DB_HOST
+DB_PORT
+DB_USER
+DB_PASSWORD
+DB_NAME
+JWT_SECRET
+PORT
+
+Example:
+
+DB_HOST=mysql
+DB_PORT=3306
+DB_USER=mindos
+DB_PASSWORD=change-me
+DB_NAME=mindos
+JWT_SECRET=change-this-secret
+PORT=5000
+
+Never commit real secrets to Git.
+
+The real .env file should remain local or be managed through a secret-management system in production.
+
+Running Without Docker
+Backend
+cd backend
+npm install
+npm start
+
+The backend runs on:
+
+http://localhost:5000
+
+Frontend
+Open another terminal:
+
+cd frontend
+npm install
+npm start
+
+The frontend runs on:
+
+http://localhost:3000
+
+Running With Docker
+From the project root:
+
+docker compose up -d --build
+
+Check containers:
+
+docker compose ps
+
+Check backend logs:
+
+docker compose logs -f backend
+
+Check MySQL logs:
+
+docker compose logs -f mysql
+
+Stop the application:
+
+docker compose down
+
+Rebuild:
+
+docker compose up -d --build
+
+Backend Health Check
+The backend should display:
+
+MySQL connected successfully
+Users table ready
+MindOS backend running on port 5000
+
+If the backend container repeatedly restarts, check:
+
+docker compose logs backend
+
+Testing JavaScript Syntax
+Before rebuilding the backend, validate all controllers:
+
+for file in backend/src/controllers/*.js; do
+  echo "Checking $file"
+  node --check "$file" || exit 1
+done
+
+Validate all routes:
+
+for file in backend/src/routes/*.js; do
+  echo "Checking $file"
+  node --check "$file" || exit 1
+done
+
+Validate middleware:
+
+for file in backend/src/middleware/*.js; do
+  echo "Checking $file"
+  node --check "$file" || exit 1
+done
+
+This helps catch JavaScript syntax errors before starting the Docker container.
+
+Troubleshooting
+Backend container keeps restarting
+First check:
+
+docker compose logs backend
+
+If you see:
+
+SyntaxError
+
+validate the controllers:
+
+for file in backend/src/controllers/*.js; do
+  node --check "$file" || exit 1
+done
+
+Then validate routes:
+
+for file in backend/src/routes/*.js; do
+  node --check "$file" || exit 1
+done
+
+ERR_CONNECTION_REFUSED
+If the browser reports:
+
+ERR_CONNECTION_REFUSED
+
+check whether the backend is running:
+
+docker compose ps
+
+Then:
+
+docker compose logs backend
+
+The backend must be listening on port 5000.
+
+Route.patch() requires a callback
+Example:
+
+Route.patch() requires a callback function
+
+This usually means the route references a controller function that is not exported.
+
+For example:
+
+router.patch("/:id/complete", completeReprogram);
+
+requires:
+
+module.exports = {
+  completeReprogram
+};
+
+The function name in the route and controller export must match.
+
+Database connection problems
+Check:
+
+docker compose logs mysql
+
+Verify the database environment variables:
+
+DB_HOST
+DB_PORT
+DB_USER
+DB_PASSWORD
+DB_NAME
+
+If using Docker Compose, DB_HOST should normally be the MySQL service name rather than localhost.
+
+DevOps
+The application is designed to move from local Docker development to cloud infrastructure.
+
+The DevOps workflow is intended to be:
+
+Developer
+   |
+   v
+Git
+   |
+   v
+CI/CD
+   |
+   +------------------+
+   |                  |
+   v                  v
+Frontend Image     Backend Image
+   |                  |
+   +--------+---------+
+            |
+            v
+          ECR
+            |
+            v
+       ECS Fargate
+            |
+            v
+           ALB
+            |
+            v
+          Users
+
+Terraform Deployment
+Terraform will manage the AWS infrastructure.
+
+The planned infrastructure includes:
+
+AWS VPC
+├── Public Subnets
+│   ├── Application Load Balancer
+│   └── NAT Gateway
+│
+├── Private Subnets
+│   ├── ECS Frontend
+│   ├── ECS Backend
+│   └── RDS MySQL
+│
+├── ECR
+│   ├── MindOS Frontend
+│   └── MindOS Backend
+│
+├── Secrets Manager
+│   ├── Database credentials
+│   └── JWT secret
+│
+└── CloudWatch
+    └── Application logs
+
+Terraform state should be stored remotely rather than committed to Git.
+
+Recommended production setup:
+
+S3
+ |
+ +-- Terraform state
+
+with state locking enabled using the AWS-supported locking mechanism configured for the Terraform version being used.
+
+Terraform Workflow
+Initialize:
+
+terraform init
+
+Format:
+
+terraform fmt -recursive
+
+Validate:
+
+terraform validate
+
+Create a plan:
+
+terraform plan
+
+Apply:
+
+terraform apply
+
+Destroy infrastructure:
+
+terraform destroy
+
+Always review:
+
+terraform plan
+
+before applying infrastructure changes to a shared or production environment.
+
+Security Practices
+The project follows these principles:
+
+Secrets
+Do not commit:
+
+.env
+*.pem
+*.key
+credentials
+AWS access keys
+database passwords
+JWT secrets
+
+Use:
+
+AWS Secrets Manager
+
+for production secrets.
+
+Database
+MySQL should not be publicly accessible.
+
+Production architecture:
+
+Internet
+   |
+   X
+ RDS
+
+Instead:
+
+Internet
+   |
+   v
+ALB
+   |
+   v
+Backend ECS
+   |
+   v
+Private RDS
+
+Network Security
+Security groups should follow least privilege.
+
+Expected traffic:
+
+Internet
+   |
+   v
+ALB : 80/443
+   |
+   v
+ECS : application port
+   |
+   v
+RDS : 3306
+
+RDS port 3306 should only be accessible from the backend security group.
+
+JWT
+JWT secrets must be stored outside source code.
+
+Development:
+
+.env
+
+Production:
+
+AWS Secrets Manager
+
+Git Ignore
+The following should not be committed:
+
+node_modules/
+.env
+.env.*
+!.env.example
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/.terraform.lock.hcl
+*.log
+
+Do not ignore .terraform.lock.hcl if you want Terraform provider versions to be reproducible; instead, commit the lock file.
+
+A production repository should therefore keep:
+
+.terraform.lock.hcl
+
+under version control.
+
+Development Workflow
+Recommended workflow:
+
+1. Make code changes
+       |
+       v
+2. Run syntax checks
+       |
+       v
+3. Test locally
+       |
+       v
+4. Build Docker images
+       |
+       v
+5. Test containers
+       |
+       v
+6. Commit to Git
+       |
+       v
+7. CI validation
+       |
+       v
+8. Build images
+       |
+       v
+9. Push images to ECR
+       |
+       v
+10. Deploy ECS
+
+Current Status
+The project currently has:
+
+React frontend
+
+Node.js/Express backend
+
+MySQL database
+
+JWT authentication
+
+Password hashing
+
+Protected routes
+
+Docker-based local deployment
+
+User database
+
+Mind functionality
+
+Thoughts functionality
+
+Focus functionality
+
+Filter functionality
+
+Reprogram functionality
+
+Profile functionality
+
+Infrastructure deployment is being prepared with Terraform.
+
+Future Improvements
+Possible future improvements include:
+
+AI-powered Explore functionality
+
+Password reset
+
+Email verification
+
+Refresh tokens
+
+Improved session management
+
+User profile editing
+
+Dashboard analytics
+
+Mind history charts
+
+Focus statistics
+
+Search
+
+Pagination
+
+Automated tests
+
+GitHub Actions CI/CD
+
+AWS ECS deployment
+
+HTTPS with ACM
+
+Custom domain
+
+CloudWatch monitoring
+
+Application alerts
+
+Terraform remote state
+
+Separate development/staging/production environments
+
+Environment Strategy
+For a production DevOps setup, environments should be separated:
+
+development
+     |
+     v
+staging
+     |
+     v
+production
+
+Each environment should have separate:
+
+ECS services
+
+RDS database
+
+Secrets
+
+Terraform state
+
+configuration
+
+Production credentials should never be reused in development.
+
+Contributing
+Create a feature branch.
+
+git checkout -b feature/my-feature
+
+Make your changes.
+
+Validate the code.
+
+npm test
+
+or run the available project checks.
+
+Test Docker locally.
+
+docker compose up -d --build
+
+Commit:
+
+git add .
+git commit -m "Add my feature"
+
+Push the branch:
+
+git push origin feature/my-feature
+
+Create a pull request.
+
+License
+This project is currently maintained as a personal/project application.
+
+Add an appropriate open-source license here if the repository will be publicly distributed.
+
+Author
+Dhruvi
+
+MindOS — Personal Mind Workspace
+
+Built with:
+
+React
+Node.js
+Express
+MySQL
+Docker
+Terraform
+AWS
+
+This README is written so that someone who receives the repository can understand what the project does, how the pieces connect, how to run it, and where the DevOps deployment is going. One important correction I included is that .terraform.lock.hcl should generally be committed, while Terraform state files and .terraform/ should not.
+
+

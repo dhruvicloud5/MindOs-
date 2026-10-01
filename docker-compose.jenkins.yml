@@ -1,0 +1,13 @@
+services:
+  jenkins:
+    build:
+      context: ./jenkins
+    container_name: dhruvi-jenkins
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - jenkins-data:/var/jenkins_home
+
+volumes:
+  jenkins-data:

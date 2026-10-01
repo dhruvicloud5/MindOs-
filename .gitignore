@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+.continue/
+project-context.txt
+node_modules/
+build/
+.env
+backend/.env
+frontend/.env
+node_modules/
+build/
